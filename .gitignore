@@ -1,2 +1,2 @@
-./packages/*
-./pubspec.lock
+packages/*
+pubspec.lock
