@@ -1,0 +1,4 @@
+name: livechat
+description: Livechat using websockets
+dependencies:
+    browser: any
