@@ -1,19 +1,10 @@
 import tornado.ioloop
 import tornado.web
-import tornado.websocket
 
-class TestWSHandler(tornado.websocket.WebSocketHandler):
-    def open(self):
-        print("Opened")
-
-    def on_message(self, message):
-        self.write_message("lol")
-
-    def on_close(self):
-        print("Closed")
+from ChatHandler import ChatHandler
 
 application = tornado.web.Application([
-    (r"/", TestWSHandler),
+    (r"/", ChatHandler),
 ]);
 
 if __name__ == "__main__":

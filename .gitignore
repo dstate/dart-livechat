@@ -2,3 +2,5 @@ packages/*
 pubspec.lock
 *.dart.js
 client/build/*
+*.swp
+*.pyc
