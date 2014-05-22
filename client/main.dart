@@ -1,20 +1,14 @@
 import 'dart:html';
-import 'dart:async';
 
-WebSocket ws;
-
-void sendNick(Event e) {
-    InputElement inputNick;
-
-    inputNick = querySelector("#inputSetNick");
-    ws.send(inputNick.value);
-}
+import 'ChatManager.dart';
+import 'CommunicationManager.dart';
 
 void main() {
-    ButtonElement btnNick;
+    CommunicationManager    comManager;
+    ChatManager             chatManager;
 
-    ws = new WebSocket('ws://localhost:1337');
-    btnNick = querySelector("#btnSetNick");
+    comManager = new CommunicationManager('ws://localhost:1337');
+    chatManager = new ChatManager(comManager);
 
-    btnNick.onClick.listen(sendNick);
+    chatManager.run();
 }

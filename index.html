@@ -2,12 +2,19 @@
 <html>
     <head>
         <title>LiveChat</title>
+        <link rel="stylesheet" href="main.css" type="text/css" />
     </head>
     <body>
-        <ul id="chatbox">
-        </ul>
-        <input id="inputSetNick" type="text" />
-        <button id="btnSetNick" />Set nickname</button>
+        <div id="container">
+            <div id="login-box">
+                <table id="login-table">
+                    <tr><td>Nickname:</td></tr>
+                    <tr><td><input id="inputSetNick" type="text" /></td></tr>
+                    <tr><td><button id="btnSetNick">Connect</button></td></tr>
+                    <tr><td id="connexionStatus"></td></tr>
+                </table>
+            </div>
+        </div>
 
         <script type="text/javascript" src="main.dart.js"></script>
     </body>

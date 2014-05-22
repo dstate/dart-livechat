@@ -20,6 +20,9 @@ JSMISC					+=	$(patsubst $(DARTDIR)%.dart, $(JSMISCDIR)%.dart.precompiled.js, $(
 
 all						:	$(JS)
 
+run						:
+							python server/main.py
+
 $(JS)					:	| $(JSMISCDIR) $(JSDIR) $(DARTDIR)
 
 $(JSMISCDIR)			:
