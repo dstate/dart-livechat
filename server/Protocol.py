@@ -5,6 +5,7 @@ class Action:
     USER_LIST       = 2
     USER_JOIN       = 3
     USER_QUITS      = 4
+    RECEIVE_MESSAGE = 5
 
 class Status:
     NONE                    = -1

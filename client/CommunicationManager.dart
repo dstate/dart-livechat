@@ -52,4 +52,10 @@ class CommunicationManager {
         String jsonPacket = this.makePacket(Protocol.Action.USER_LIST, {});
         return this.sendData(jsonPacket);
     }
+
+    bool sendMessageRequest(String message) {
+        Map data = {'message': message};
+        String jsonPacket = this.makePacket(Protocol.Action.SEND_MESSAGE, data);
+        return this.sendData(jsonPacket);
+    }
 }

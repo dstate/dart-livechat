@@ -28,8 +28,24 @@ class ChatManager {
         this.comManager.listenForAction(Protocol.Action.USER_QUITS, this.userQuitsListener);
 
         InputElement inputSetNick = querySelector('#inputSetNick');
+        inputSetNick.focus();
+        inputSetNick.onKeyUp.listen((KeyboardEvent e) {
+            KeyEvent ke = new KeyEvent.wrap(e);
+            if (ke.keyCode == KeyCode.ENTER)
+                this.setNicknameCallback(inputSetNick.value);
+        });
+
         ButtonElement btnSetNick = querySelector('#btnSetNick');
         btnSetNick.onClick.listen((Event e) => this.setNicknameCallback(inputSetNick.value));
+
+        TextAreaElement inputMessage = querySelector('#inputMessage');
+        inputMessage.onKeyPress.listen((KeyboardEvent e) {
+            KeyEvent ke = new KeyEvent.wrap(e);
+            if (ke.keyCode == KeyCode.ENTER) {
+                e.preventDefault();
+                this.comManager.sendMessageRequest(inputMessage.text);
+            }
+        });
 
         DivElement chatBox = querySelector('#chat-box');
         chatBox.hidden = true;
@@ -41,6 +57,19 @@ class ChatManager {
         TableSectionElement connexionStatus = querySelector('#connexionStatus');
         connexionStatus.text = msg;
     }
+
+    void displayChat() {
+        DivElement loginBox = querySelector('#login-box');
+        loginBox.hidden = true;
+        DivElement chatBox = querySelector('#chat-box');
+        chatBox.hidden = false;
+
+        TextAreaElement inputMessage = querySelector('#inputMessage');
+        inputMessage.focus();
+
+        this.comManager.userListRequest();
+    }
+
 
     void setNicknameCallback(String nickname) {
         if (this.state == ChatState.IDLE) {
@@ -78,13 +107,6 @@ class ChatManager {
             } else if (data['code'] == Protocol.Status.SUCCESS_NICKNAME_SET) {
                 this.logForUser('Success!');
                 this.state = ChatState.CONNECTED;
-
-                DivElement loginBox = querySelector('#login-box');
-                loginBox.hidden = true;
-                DivElement chatBox = querySelector('#chat-box');
-                chatBox.hidden = false;
-
-                this.comManager.userListRequest();
             }
         }
     }
