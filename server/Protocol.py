@@ -2,6 +2,9 @@ class Action:
     STATUS          = -1
     SET_NICKNAME    = 0
     SEND_MESSAGE    = 1
+    USER_LIST       = 2
+    USER_JOIN       = 3
+    USER_QUITS      = 4
 
 class Status:
     NONE                    = -1

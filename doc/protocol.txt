@@ -5,17 +5,21 @@
 
 
 [ACTION]
-+-------------------------------+------------------+
-| Value | Action                | Direction        |
-+-------------------------------+------------------+
-| -1    | Status                | Server -> Client |
-| 0     | Set nickname          | Client -> Server |
-| 1     | Send message          | Client -> Server |
-+-------------------------------+------------------+
++-------------------------------+-------------------+
+| Value | Action                | Direction         |
++-------------------------------+-------------------+
+| -1    | Status                | Server -> Client  |
+| 0     | Set nickname          | Client -> Server  |
+| 1     | Send message          | Client -> Server  |
+| 2     | User list             | Server <-> Client |
+| 3     | User join             | Server -> Client  |
+| 4     | User quits            | Server -> Client  |
++-------------------------------+-------------------+
 
 ################################################################################
 
 [DATA] with [ACTION] == -1
+=> STATUS
 
 {code: [CODE]}
 [CODE] - integer
@@ -33,6 +37,7 @@
 ################################################################################
 
 [DATA] with [ACTION] == 0
+=> SET_NICKNAME
 
 {nickname: [NICKNAME]}
 [NICKNAME] - string
@@ -40,8 +45,35 @@
 ################################################################################
 
 [DATA] with [ACTION] == 1
+=> SEND_MESSAGE
 
 {message: [MESSAGE]}
 [MESSAGE] - string
 
 ################################################################################
+
+[DATA] with [ACTION] == 2
+=> USER_LIST
+
+// Client -> Server \\
+{}
+
+// Server -> Client \\
+{users: [USERS]}
+[USERS] - array<string>
+
+################################################################################
+
+[DATA] with [ACTION] == 3
+=> USER_JOIN
+
+{nickname: [NICKNAME]}
+[NICKNAME] - string
+
+################################################################################
+
+[DATA] with [ACTION] == 4
+=> USER_QUITS
+
+{nickname: [NICKNAME]}
+[NICKNAME] - string

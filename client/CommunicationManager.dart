@@ -43,9 +43,13 @@ class CommunicationManager {
     }
 
     bool setNicknameRequest(String nickname) {
-        Map data = new Map();
-        data['nickname'] = nickname;
+        Map data = {'nickname': nickname};
         String jsonPacket = this.makePacket(Protocol.Action.SET_NICKNAME, data);
+        return this.sendData(jsonPacket);
+    }
+
+    bool userListRequest() {
+        String jsonPacket = this.makePacket(Protocol.Action.USER_LIST, {});
         return this.sendData(jsonPacket);
     }
 }
