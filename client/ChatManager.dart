@@ -6,10 +6,13 @@ import 'CommunicationManager.dart';
 import 'ChatState.dart';
 import 'UsersManager.dart';
 import 'User.dart';
+import 'MessagesManager.dart';
+import 'Message.dart';
 
 class ChatManager {
     CommunicationManager    comManager;
     UsersManager            usersManager;
+    MessagesManager         msgManager;
     User                    user;
     num                     state;
 
@@ -17,6 +20,7 @@ class ChatManager {
     ChatManager(CommunicationManager comManager) {
         this.comManager = comManager;
         this.usersManager = new UsersManager(querySelector('#users-section'));
+        this.msgManager = new MessagesManager(querySelector('#messages-section'));
         this.user = new User();
         this.state = ChatState.IDLE;
     }
@@ -26,6 +30,7 @@ class ChatManager {
         this.comManager.listenForAction(Protocol.Action.USER_LIST, this.userListListener);
         this.comManager.listenForAction(Protocol.Action.USER_JOIN, this.userJoinListener);
         this.comManager.listenForAction(Protocol.Action.USER_QUITS, this.userQuitsListener);
+        this.comManager.listenForAction(Protocol.Action.RECEIVE_MESSAGE, this.receiveMessageListener);
 
         InputElement inputSetNick = querySelector('#inputSetNick');
         inputSetNick.focus();
@@ -43,7 +48,8 @@ class ChatManager {
             KeyEvent ke = new KeyEvent.wrap(e);
             if (ke.keyCode == KeyCode.ENTER) {
                 e.preventDefault();
-                this.comManager.sendMessageRequest(inputMessage.text);
+                this.comManager.sendMessageRequest(inputMessage.value);
+                inputMessage.value = '';
             }
         });
 
@@ -54,8 +60,15 @@ class ChatManager {
     }
 
     void logForUser(String msg) {
-        TableSectionElement connexionStatus = querySelector('#connexionStatus');
-        connexionStatus.text = msg;
+        if (this.state == ChatState.CONNECTED) {
+            UListElement list = querySelector('#messages-section');
+            LIElement el = new LIElement();
+            el.text = msg;
+            list.children.add(el);
+        } else {
+            TableSectionElement connexionStatus = querySelector('#connexionStatus');
+            connexionStatus.text = msg;
+        }
     }
 
     void displayChat() {
@@ -107,6 +120,7 @@ class ChatManager {
             } else if (data['code'] == Protocol.Status.SUCCESS_NICKNAME_SET) {
                 this.logForUser('Success!');
                 this.state = ChatState.CONNECTED;
+                this.displayChat();
             }
         }
     }
@@ -115,7 +129,11 @@ class ChatManager {
         List<String> usersStrList = data['users'];
         List<User> usersList = [];
 
-        usersStrList.forEach((String nickname) => usersList.add(new User(nickname)));
+        usersList.add(this.user);
+        usersStrList.forEach((String nickname) {
+            if (nickname != this.user.getNickname())
+                usersList.add(new User(nickname));
+        });
         this.usersManager.setUsers(usersList);
     }
 
@@ -130,5 +148,11 @@ class ChatManager {
         User u = new User(data['nickname']);
 
         this.usersManager.removeUser(u);
+    }
+
+    void receiveMessageListener(Map data) {
+        User sender = this.usersManager.getUserByNickname(data['nickname']);
+        Message msg = new Message(sender, data['message']);
+        this.msgManager.addMessage(msg);
     }
 }

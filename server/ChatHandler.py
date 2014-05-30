@@ -24,7 +24,7 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
         if len(self.user.nickname) > 0:
             packet = self.user_quits()
             self.broadcast_packet(packet)
-            print '[SUCCESS] ' + self.user.nickname + ' left.';
+            print self.user.nickname + ' left.';
 
     def make_packet(self, action, data):
         packet = {'action': action, 'data': data}
@@ -50,6 +50,7 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
                 packet = self.make_packet(Protocol.Action.RECEIVE_MESSAGE,
                         {'nickname': self.user.nickname, 'message': json_result['data']['message']})
                 self.broadcast_packet(packet)
+                print self.user.nickname + ': ' + json_result['data']['message']
                 return Protocol.Status.NONE
         except (ValueError, KeyError):
             print '[EXCEPTION] Bad json: "' + message + '".'
@@ -57,7 +58,7 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
 
     def set_nickname(self, data):
         self.user.nickname = data['nickname']
-        print '[SUCCESS] ' + self.user.nickname + ' joined.';
+        print self.user.nickname + ' joined.';
 
     def user_list(self):
         user_list = []
