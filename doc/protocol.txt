@@ -15,6 +15,7 @@
 | 3     | User join             | Server -> Client  |
 | 4     | User quits            | Server -> Client  |
 | 5     | Receive message       | Server -> Client  |
+| 6     | Live                  | Server <-> Client |
 +-------------------------------+-------------------+
 
 ################################################################################
@@ -87,3 +88,14 @@
 {nickname: [NICKNAME], message: [MESSAGE]}
 [NICKNAME] - string
 [MESSAGE] - string
+
+################################################################################
+
+[DATA] with [ACTION] == 6
+=> LIVE
+
+// Client -> Server \\
+{}
+
+// Server -> Client \\
+{}

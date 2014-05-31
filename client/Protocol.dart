@@ -8,6 +8,7 @@ class Action {
     static const num USER_JOIN          = 3;
     static const num USER_QUITS         = 4;
     static const num RECEIVE_MESSAGE    = 5;
+    static const num LIVE               = 6;
 }
 
 class Status {

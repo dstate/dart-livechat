@@ -6,6 +6,7 @@ class Action:
     USER_JOIN       = 3
     USER_QUITS      = 4
     RECEIVE_MESSAGE = 5
+    LIVE            = 6
 
 class Status:
     NONE                    = -1

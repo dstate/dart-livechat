@@ -23,6 +23,8 @@ all						:	$(JS)
 run						:
 							python server/main.py
 
+cr						:	re run
+
 $(JS)					:	| $(JSMISCDIR) $(JSDIR) $(DARTDIR)
 
 $(JSMISCDIR)			:
@@ -48,4 +50,4 @@ fclean					:	clean
 
 re						:	fclean all
 
-.PHONY					:	clean fclean re
+.PHONY					:	run cr clean fclean re

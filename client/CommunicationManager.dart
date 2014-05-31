@@ -58,4 +58,9 @@ class CommunicationManager {
         String jsonPacket = this.makePacket(Protocol.Action.SEND_MESSAGE, data);
         return this.sendData(jsonPacket);
     }
+
+    bool liveRequest() {
+        String jsonPacket = this.makePacket(Protocol.Action.LIVE, {});
+        return this.sendData(jsonPacket);
+    }
 }

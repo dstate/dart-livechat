@@ -15,7 +15,7 @@ class ChatManager {
     MessagesManager         msgManager;
     User                    user;
     num                     state;
-
+    DateTime                lastLive;
 
     ChatManager(CommunicationManager comManager) {
         this.comManager = comManager;
@@ -23,6 +23,7 @@ class ChatManager {
         this.msgManager = new MessagesManager(querySelector('#messages-section'));
         this.user = new User();
         this.state = ChatState.IDLE;
+        this.lastLive = new DateTime.now();
     }
 
     void run() {
@@ -31,6 +32,18 @@ class ChatManager {
         this.comManager.listenForAction(Protocol.Action.USER_JOIN, this.userJoinListener);
         this.comManager.listenForAction(Protocol.Action.USER_QUITS, this.userQuitsListener);
         this.comManager.listenForAction(Protocol.Action.RECEIVE_MESSAGE, this.receiveMessageListener);
+        this.comManager.listenForAction(Protocol.Action.LIVE, this.liveListener);
+
+        Timer timer = new Timer.periodic(new Duration(seconds: 1), (Timer t) {
+                DateTime now = new DateTime.now();
+
+                if (now.millisecondsSinceEpoch - this.lastLive.millisecondsSinceEpoch > 5000) {
+                    this.logForUser('<span class="error">Disconnected from server. <a href="">Click here to refresh and try to reconnect.</a></span>');
+                    t.cancel();
+                } else {
+                    this.comManager.liveRequest();
+                }
+        });
 
         InputElement inputSetNick = querySelector('#inputSetNick');
         inputSetNick.focus();
@@ -48,8 +61,10 @@ class ChatManager {
             KeyEvent ke = new KeyEvent.wrap(e);
             if (ke.keyCode == KeyCode.ENTER) {
                 e.preventDefault();
-                this.comManager.sendMessageRequest(inputMessage.value);
-                inputMessage.value = '';
+                if (inputMessage.value.length > 0) {
+                    this.comManager.sendMessageRequest(inputMessage.value);
+                    inputMessage.value = '';
+                }
             }
         });
 
@@ -63,11 +78,11 @@ class ChatManager {
         if (this.state == ChatState.CONNECTED) {
             UListElement list = querySelector('#messages-section');
             LIElement el = new LIElement();
-            el.text = msg;
+            el.setInnerHtml(msg);
             list.children.add(el);
         } else {
             TableSectionElement connexionStatus = querySelector('#connexionStatus');
-            connexionStatus.text = msg;
+            connexionStatus.setInnerHtml(msg);
         }
     }
 
@@ -154,5 +169,11 @@ class ChatManager {
         User sender = this.usersManager.getUserByNickname(data['nickname']);
         Message msg = new Message(sender, data['message']);
         this.msgManager.addMessage(msg);
+        UListElement el = querySelector('#messages-section');
+        el.scrollTop = el.scrollHeight;
+    }
+
+    void liveListener(Map data) {
+        this.lastLive = new DateTime.now();
     }
 }

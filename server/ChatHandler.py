@@ -1,5 +1,7 @@
 import tornado.websocket
 import json
+import threading
+import time
 
 import Protocol
 from User import User
@@ -10,14 +12,18 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         self.user = User()
+        self.last_live = time.time()
+        self.connected = True
         ChatHandler.opened_connexions.append(self)
+        threading.Timer(1, self.manage_live).start()
 
     def on_message(self, message):
-        ret = self.manage_message(message)
-        if ret != Protocol.Status.NONE:
-            data = {'code': ret}
-            packet = self.make_packet(Protocol.Action.STATUS, data)
-            self.write_message(packet)
+        if self.connected:
+            ret = self.manage_message(message)
+            if ret != Protocol.Status.NONE:
+                data = {'code': ret}
+                packet = self.make_packet(Protocol.Action.STATUS, data)
+                self.write_message(packet)
 
     def on_close(self):
         self.opened_connexions.remove(self)
@@ -52,6 +58,8 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
                 self.broadcast_packet(packet)
                 print self.user.nickname + ': ' + json_result['data']['message']
                 return Protocol.Status.NONE
+            elif json_result['action'] == Protocol.Action.LIVE:
+                self.last_live = time.time()
         except (ValueError, KeyError):
             print '[EXCEPTION] Bad json: "' + message + '".'
             return Protocol.Status.ERROR_BAD_JSON
@@ -75,3 +83,14 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
         ChatHandler.active_users.remove(self.user)
         packet = self.make_packet(Protocol.Action.USER_QUITS, {'nickname': self.user.nickname})
         return packet
+
+    def manage_live(self):
+        if time.time() - self.last_live > 5:
+            self.connected = False;
+            if len(self.user.nickname) > 0:
+                print self.user.nickname + ' timed out.'
+        else:
+            threading.Timer(1, self.manage_live).start()
+            packet = self.make_packet(Protocol.Action.LIVE, {})
+            self.write_message(packet)
+
